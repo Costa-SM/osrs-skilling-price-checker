@@ -173,6 +173,7 @@ tr:hover td { background: var(--hover); }
 }
 .bp { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
 .bl { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red); }
+.members-badge { background: #1a0e28; color: #c080ff; border: 1px solid #6030a0; }
 
 /* ── Metal tier pills ── */
 .pill {
@@ -183,12 +184,17 @@ tr:hover td { background: var(--hover); }
   border-radius: 10px;
   white-space: nowrap;
 }
-.pill-Bronze  { background: #2a1800; color: #cd8040; border: 1px solid #6a3a10; }
-.pill-Iron    { background: #1a1a1a; color: #a0a0a0; border: 1px solid #505050; }
-.pill-Steel   { background: #161626; color: #9090c8; border: 1px solid #404070; }
-.pill-Mithril { background: #0a0a28; color: #5870ff; border: 1px solid #282870; }
-.pill-Adamant { background: #081808; color: #38b838; border: 1px solid #185818; }
-.pill-Rune    { background: #001828; color: #38b8d8; border: 1px solid #085888; }
+.pill-Bronze      { background: #2a1800; color: #cd8040; border: 1px solid #6a3a10; }
+.pill-Iron        { background: #1a1a1a; color: #a0a0a0; border: 1px solid #505050; }
+.pill-Steel       { background: #161626; color: #9090c8; border: 1px solid #404070; }
+.pill-Mithril     { background: #0a0a28; color: #5870ff; border: 1px solid #282870; }
+.pill-Adamant     { background: #081808; color: #38b838; border: 1px solid #185818; }
+.pill-Rune        { background: #001828; color: #38b8d8; border: 1px solid #085888; }
+
+.pill-dhide-Green { background: #081808; color: #50d050; border: 1px solid #206020; }
+.pill-dhide-Blue  { background: #001828; color: #50b8e8; border: 1px solid #0858a0; }
+.pill-dhide-Red   { background: #200808; color: #e05050; border: 1px solid #901818; }
+.pill-dhide-Black { background: #101010; color: #909090; border: 1px solid #404040; }
 
 .sub-note  { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
 .note-cell { color: var(--muted); font-size: 0.78rem; max-width: 200px; line-height: 1.4; }
