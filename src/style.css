@@ -1,0 +1,218 @@
+:root {
+  --bg:       #0e0902;
+  --panel:    #1b1308;
+  --border:   #3e2e0e;
+  --text:     #f0e6c8;
+  --muted:    #8a7040;
+  --gold:     #e8b820;
+  --green:    #46a046;
+  --red:      #c03232;
+  --green-bg: #0a1e0a;
+  --red-bg:   #1e0a0a;
+  --hover:    #181008;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', 'Trebuchet MS', sans-serif;
+  padding: 24px 20px;
+  min-height: 100vh;
+}
+
+h1 { font-size: 1.7rem; color: var(--gold); margin-bottom: 4px; }
+.subtitle { color: var(--muted); font-size: 0.87rem; margin-bottom: 14px; }
+
+/* ── Skill nav ── */
+#skill-nav {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+#skill-nav a {
+  display: inline-block;
+  padding: 7px 18px;
+  color: var(--muted);
+  text-decoration: none;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  font-size: 0.88rem;
+  margin-bottom: -1px;
+}
+
+#skill-nav a:hover:not(.active) { color: var(--text); }
+
+#skill-nav a.active {
+  color: var(--gold);
+  background: var(--bg);
+  border-bottom: 1px solid var(--bg);
+  z-index: 1;
+}
+
+/* ── Toolbar ── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+#status            { font-size: 0.85rem; color: var(--muted); }
+#status.loading    { color: var(--gold); }
+#status.error      { color: var(--red);  }
+#countdown         { font-size: 0.82rem; color: var(--muted); }
+#nature-price      { font-size: 0.85rem; color: var(--muted); }
+
+button {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 5px 13px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.83rem;
+}
+button:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.tab {
+  background: var(--panel);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  padding: 7px 20px;
+  border-radius: 3px 3px 0 0;
+  cursor: pointer;
+  font-size: 0.88rem;
+  margin-bottom: -1px;
+}
+.tab.active            { background: var(--bg); color: var(--gold); border-bottom: 1px solid var(--bg); z-index: 1; }
+.tab:hover:not(.active){ color: var(--text); }
+
+.tab-panel         { display: none; padding-top: 16px; }
+.tab-panel.active  { display: block; }
+
+/* ── Anvil controls ── */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.ctrl-group { display: flex; align-items: center; gap: 6px; }
+.ctrl-label { font-size: 0.82rem; color: var(--muted); }
+
+.cbtn {
+  background: var(--panel);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.79rem;
+}
+.cbtn.active           { background: #2a1f0a; color: var(--gold); border-color: var(--gold); }
+.cbtn:hover:not(.active){ color: var(--text); }
+
+/* ── Tables ── */
+.scroll { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  min-width: 780px;
+}
+
+th {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 8px 11px;
+  text-align: left;
+  color: var(--gold);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+td {
+  border: 1px solid var(--border);
+  padding: 7px 11px;
+  vertical-align: middle;
+}
+
+tr:hover td { background: var(--hover); }
+
+.r { text-align: right; white-space: nowrap; }
+
+/* ── Profit styling ── */
+.pos { color: var(--green); font-weight: 600; }
+.neg { color: var(--red);   font-weight: 600; }
+.na  { color: var(--muted); }
+
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-left: 5px;
+  letter-spacing: 0.4px;
+  vertical-align: middle;
+}
+.bp { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
+.bl { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red); }
+
+/* ── Metal tier pills ── */
+.pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.pill-Bronze  { background: #2a1800; color: #cd8040; border: 1px solid #6a3a10; }
+.pill-Iron    { background: #1a1a1a; color: #a0a0a0; border: 1px solid #505050; }
+.pill-Steel   { background: #161626; color: #9090c8; border: 1px solid #404070; }
+.pill-Mithril { background: #0a0a28; color: #5870ff; border: 1px solid #282870; }
+.pill-Adamant { background: #081808; color: #38b838; border: 1px solid #185818; }
+.pill-Rune    { background: #001828; color: #38b8d8; border: 1px solid #085888; }
+
+.sub-note  { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+.note-cell { color: var(--muted); font-size: 0.78rem; max-width: 200px; line-height: 1.4; }
+
+/* ── Volume ── */
+.vol-hi  { color: var(--green); }
+.vol-mid { color: var(--muted); }
+.vol-lo  { color: var(--red);   }
+
+/* ── Smelting inputs ── */
+.inputs    { line-height: 1.65; }
+.qty       { color: var(--gold); margin-right: 3px; }
+.each      { color: var(--muted); font-size: 0.78rem; }
+
+/* ── Footer ── */
+footer {
+  margin-top: 22px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px 16px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 780px;
+}
+footer strong { color: var(--text); }
