@@ -1,2 +1,5 @@
 node_modules/
 dist/
+
+# Pages from the wiki for Claude to use as reference.
+wiki/
