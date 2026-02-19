@@ -190,6 +190,7 @@ tr:hover td { background: var(--hover); }
 .pill-Mithril     { background: #0a0a28; color: #5870ff; border: 1px solid #282870; }
 .pill-Adamant     { background: #081808; color: #38b838; border: 1px solid #185818; }
 .pill-Rune        { background: #001828; color: #38b8d8; border: 1px solid #085888; }
+.pill-Gold        { background: #1e1600; color: #e8b820; border: 1px solid #806000; }
 
 .pill-dhide-Green { background: #081808; color: #50d050; border: 1px solid #206020; }
 .pill-dhide-Blue  { background: #001828; color: #50b8e8; border: 1px solid #0858a0; }

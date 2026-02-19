@@ -1,10 +1,13 @@
-import { SI, SMELT_RECIPES, ANVIL_RECIPES } from './data.js';
+import { SI, SMELT_RECIPES, ANVIL_RECIPES, DART_RECIPES, BOLT_RECIPES,
+         ARROWTIP_RECIPES, JAVELIN_TIP_RECIPES, KNIFE_RECIPES } from './data.js';
 import { fmtGP, volCell, profitCell, gpxpCell } from '../../formatters.js';
 
 // Internal tab/filter/sort state — persists across price updates
 let activeTab   = 'smelting';
 let anvilFilter = 'all';
 let anvilSort   = 'level';
+let dartsFilter = 'all'; // 'all'|'darts'|'bolts'|'arrowtips'|'javelins'|'knives'
+let dartsSort   = 'level';
 
 // Latest state reference for use inside button callbacks after re-render
 let _state = { prices: {}, volumes: {} };
@@ -16,6 +19,7 @@ export function render(container, state) {
   syncState(container);
   renderSmelt(container, state);
   renderAnvil(container, state);
+  renderDartsBolts(container, state);
   updateNaturePrice(state);
 }
 
@@ -26,6 +30,7 @@ function buildShell() {
 <div class="tabs">
   <button class="tab" data-tab="smelting">&#128293; Smelting</button>
   <button class="tab" data-tab="anvil">&#9874; Anvil Smithing</button>
+  <button class="tab" data-tab="darts">&#9935; Darts &amp; Bolts</button>
 </div>
 
 <div id="tab-smelting" class="tab-panel">
@@ -60,6 +65,7 @@ function buildShell() {
       <button class="cbtn" data-filter="Bronze">Bronze</button>
       <button class="cbtn" data-filter="Iron">Iron</button>
       <button class="cbtn" data-filter="Steel">Steel</button>
+      <button class="cbtn" data-filter="Gold">Gold</button>
       <button class="cbtn" data-filter="Mithril">Mithril</button>
       <button class="cbtn" data-filter="Adamant">Adamant</button>
       <button class="cbtn" data-filter="Rune">Rune</button>
@@ -87,6 +93,42 @@ function buildShell() {
         </tr>
       </thead>
       <tbody id="anvil-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="tab-darts" class="tab-panel">
+  <div class="controls">
+    <div class="ctrl-group">
+      <span class="ctrl-label">Type:</span>
+      <button class="cbtn" data-darts-filter="all">All</button>
+      <button class="cbtn" data-darts-filter="darts">Darts</button>
+      <button class="cbtn" data-darts-filter="bolts">Bolts</button>
+      <button class="cbtn" data-darts-filter="arrowtips">Arrowtips</button>
+      <button class="cbtn" data-darts-filter="javelins">Javelins</button>
+      <button class="cbtn" data-darts-filter="knives">Knives</button>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Sort:</span>
+      <button class="cbtn" data-darts-sort="level">Level &#9660;</button>
+      <button class="cbtn" data-darts-sort="gpxp">GP&#183;XP &#9650;</button>
+    </div>
+  </div>
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th class="r">Lvl</th>
+          <th class="r">XP</th>
+          <th class="r">Bar Cost</th>
+          <th class="r">Sell Price (total)</th>
+          <th class="r">Daily Volume</th>
+          <th class="r">Profit</th>
+          <th class="r">GP / XP</th>
+        </tr>
+      </thead>
+      <tbody id="darts-body"></tbody>
     </table>
   </div>
 </div>`;
@@ -119,6 +161,24 @@ function wireEvents(container) {
       renderAnvil(container, _state);
     });
   });
+
+  container.querySelectorAll('.cbtn[data-darts-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      dartsFilter = btn.dataset.dartsFilter;
+      container.querySelectorAll('.cbtn[data-darts-filter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderDartsBolts(container, _state);
+    });
+  });
+
+  container.querySelectorAll('.cbtn[data-darts-sort]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      dartsSort = btn.dataset.dartsSort;
+      container.querySelectorAll('.cbtn[data-darts-sort]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderDartsBolts(container, _state);
+    });
+  });
 }
 
 // Restores tab/filter/sort active classes after a shell rebuild
@@ -135,6 +195,12 @@ function syncState(container) {
 
   const sortBtn = container.querySelector(`.cbtn[data-sort="${anvilSort}"]`);
   if (sortBtn) sortBtn.classList.add('active');
+
+  const dartsFilterBtn = container.querySelector(`.cbtn[data-darts-filter="${dartsFilter}"]`);
+  if (dartsFilterBtn) dartsFilterBtn.classList.add('active');
+
+  const dartsSortBtn = container.querySelector(`.cbtn[data-darts-sort="${dartsSort}"]`);
+  if (dartsSortBtn) dartsSortBtn.classList.add('active');
 }
 
 // ── Smelting table ───────────────────────────────────────────────────────────
@@ -152,7 +218,8 @@ function renderSmelt(container, state) {
       if (p == null) { cost = null; break; }
       cost += p * qty;
     }
-    const sell  = sellPrice(r.output.id);
+    const rawSell = sellPrice(r.output.id);
+    const sell  = rawSell != null ? rawSell * (r.outputQty ?? 1) : null;
     const rate  = r.furnaceRate ?? 1;
     const furnP = (cost != null && sell != null) ? sell - cost / rate : null;
     const shP   = (cost != null && sell != null && nrp != null) ? sell - cost - nrp : null;
@@ -168,8 +235,9 @@ function renderSmelt(container, state) {
     const shCell = r.canSH ? profitCell(shP)      : `<span class="na">N/A</span>`;
     const sxCell = r.canSH ? gpxpCell(shP, r.xp)  : `<span class="na">N/A</span>`;
 
+    const memberBadge = r.members ? ` <span class="badge members-badge">P2P</span>` : '';
     return `<tr>
-      <td><strong>${r.name}</strong></td>
+      <td><strong>${r.name}</strong>${memberBadge}</td>
       <td class="r" style="color:var(--muted)">${r.level}</td>
       <td class="r" style="color:var(--muted)">${r.xp}</td>
       <td class="inputs">${inputsHtml}</td>
@@ -217,10 +285,11 @@ function renderAnvil(container, state) {
   }
 
   const html = rows.map(r => {
+    const memberBadge = r.members ? ` <span class="badge members-badge">P2P</span>` : '';
     const noteHtml = r.outputQty
       ? `<span style="font-size:0.76rem;color:var(--muted)">&times;${r.outputQty} output</span>` : '';
     return `<tr>
-      <td><strong>${r.name}</strong> ${noteHtml}</td>
+      <td><strong>${r.name}</strong>${memberBadge} ${noteHtml}</td>
       <td><span class="pill pill-${r.metal}">${r.metal}</span></td>
       <td class="r" style="color:var(--muted)">${r.level}</td>
       <td class="r" style="color:var(--muted)">${r.xp}</td>
@@ -235,6 +304,54 @@ function renderAnvil(container, state) {
 
   container.querySelector('#anvil-body').innerHTML =
     html || `<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--muted)">No items.</td></tr>`;
+}
+
+// ── Darts & Bolts table ──────────────────────────────────────────────────────
+
+function renderDartsBolts(container, state) {
+  const { prices, volumes } = state;
+  const buyPrice  = id => prices[id]?.high ?? null;
+  const sellPrice = id => prices[id]?.low  ?? null;
+
+  const source = dartsFilter === 'darts'     ? DART_RECIPES
+               : dartsFilter === 'bolts'     ? BOLT_RECIPES
+               : dartsFilter === 'arrowtips' ? ARROWTIP_RECIPES
+               : dartsFilter === 'javelins'  ? JAVELIN_TIP_RECIPES
+               : dartsFilter === 'knives'    ? KNIFE_RECIPES
+               : [...DART_RECIPES, ...BOLT_RECIPES, ...ARROWTIP_RECIPES,
+                  ...JAVELIN_TIP_RECIPES, ...KNIFE_RECIPES];
+
+  let rows = source.map(r => {
+    const barCost  = buyPrice(r.barId);
+    const itemSell = sellPrice(r.outputId);
+    const sell     = itemSell != null ? itemSell * r.outputQty : null;
+    const profit   = (barCost != null && sell != null) ? sell - barCost : null;
+    return { ...r, barCost, sell, profit };
+  });
+
+  if (dartsSort === 'gpxp') {
+    rows.sort((a, b) => {
+      const ka = a.profit != null ? a.profit / a.xp : -Infinity;
+      const kb = b.profit != null ? b.profit / b.xp : -Infinity;
+      return kb - ka;
+    });
+  } else {
+    rows.sort((a, b) => a.level - b.level || a.xp - b.xp);
+  }
+
+  const html = rows.map(r => `<tr>
+    <td><strong>${r.name}</strong> <span class="badge members-badge">P2P</span></td>
+    <td class="r" style="color:var(--muted)">${r.level}</td>
+    <td class="r" style="color:var(--muted)">${r.xp}</td>
+    <td class="r">${fmtGP(r.barCost)}</td>
+    <td class="r">${fmtGP(r.sell)}</td>
+    <td class="r">${volCell(r.outputId, volumes)}</td>
+    <td class="r">${profitCell(r.profit)}</td>
+    <td class="r">${gpxpCell(r.profit, r.xp)}</td>
+  </tr>`).join('');
+
+  container.querySelector('#darts-body').innerHTML =
+    html || `<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">No items.</td></tr>`;
 }
 
 // ── Nature rune price in toolbar ─────────────────────────────────────────────
